@@ -8,9 +8,11 @@ using AppRpgEtec.Models;
 using AppRpgEtec.Models.Enuns;
 using AppRpgEtec.Services.Personagens;
 using System.Windows.Input;
+using System.Linq;
 
 namespace AppRpgEtec.ViewModels.Personagens
 {
+    [QueryProperty("PersonagemSelecionadoId", "pId")]
     public class CadastroPersonagemViewModel : BaseViewModel
     {
         private PersonagemService pService;
@@ -113,6 +115,8 @@ namespace AppRpgEtec.ViewModels.Personagens
             }
         }
 
+ 
+
         public async Task SalvarPersonagem()
         {
             try
@@ -133,9 +137,11 @@ namespace AppRpgEtec.ViewModels.Personagens
                 };
                 if (model.Id == 0)
                     await pService.PostPersonagemAsync(model);
+                else
+                    await pService.PutPersonagemAsync(model);
 
-                await Application.Current.MainPage
-                    .DisplayAlert("Mensagem", "Dados salvos com sucesso!", "Ok");
+                    await Application.Current.MainPage
+                        .DisplayAlert("Mensagem", "Dados salvos com sucesso!", "Ok");
 
                 await Shell.Current.GoToAsync("..");
             }
@@ -143,6 +149,45 @@ namespace AppRpgEtec.ViewModels.Personagens
             {
                 await Application.Current.MainPage
                     .DisplayAlert("Ops", ex.Message + " Detalhes: " + ex.InnerException, "Ok");
+            }
+        }
+
+        public async void carregarPersonagem()
+        {
+            try
+            {
+                Personagem p = await
+                    pService.GetPersonagemAsync(int.Parse(personagemSelecionadoId));
+                this.Nome = p.Nome;
+                this.PontosVida = p.PontosVida;
+                this.Defesa = p.Defesa;
+                this.Derrotas = p.Derrotas;
+                this.disputas = p.Disputas;
+                this.Forca = p.Forca;
+                this.Inteligencia = p.Inteligencia;
+                this.Vitorias = p.Vitorias;
+                this.Id = p.Id;
+
+                TipoClasseSelecionado = this.ListaTiposClasse
+                    .FirstOrDefault(tClasse => tClasse.Id == (int)p.Classe);
+            }
+            catch (Exception ex)
+            {
+                await Application.Current.MainPage
+                    .DisplayAlert("Ops", ex.Message + " Detalhes: " + ex.InnerException, "Ok");
+            }
+        }
+
+        private string personagemSelecionadoId;
+        public string PersonagemSelecionadoId
+        {
+            set
+            {
+                if (value != null)
+                {
+                    personagemSelecionadoId = Uri.UnescapeDataString(value);
+                    carregarPersonagem();
+                }
             }
         }
     }

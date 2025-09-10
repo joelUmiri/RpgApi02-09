@@ -46,5 +46,10 @@ namespace AppRpgEtec.Services.Personagens
         {
             string urlComplementar = string.Format("/{0}", personagemId); var result = await _request.DeleteAsync(apiUrlBase + urlComplementar, _token); return result;
         }
+
+        internal async Task DeletarPersonagemAsync(int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
