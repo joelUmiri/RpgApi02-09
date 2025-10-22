@@ -59,6 +59,9 @@ namespace AppRpgEtec.ViewModels.Usuarios
         #endregion
 
         #region Metodos
+
+        private CancellationTokenSource _cancellationTokenSource;
+        private bool _isCheckingLocation;
         public async Task AutenticarUsuario()
         {
             try
@@ -78,6 +81,22 @@ namespace AppRpgEtec.ViewModels.Usuarios
                     Preferences.Set("UsuarioUsername", uAutenticado.Username);
                     Preferences.Set("UsuarioPerfil", uAutenticado.Perfil);
                     Preferences.Set("UsuarioToken", uAutenticado.Token);
+
+
+                    _isCheckingLocation = true;
+                    _cancellationTokenSource = new CancellationTokenSource();
+                    GeolocationRequest request =
+                        new GeolocationRequest(GeolocationAccuracy.Medium, TimeSpan.FromSeconds(10));
+
+                    Location location = await Geolocation.Default.GetLocationAsync(request, _cancellationTokenSource.Token);
+
+                    Usuario uLoc = new Usuario();
+                    uLoc.Id = uAutenticado.Id;
+                    uLoc.Latitude = location.Latitude;
+                    uLoc.Longitude = location.Longitude;
+
+                    UsuarioService uServiceLoc = new UsuarioService(uAutenticado.Token);
+                    await uServiceLoc.PutAtuaizarLocalizacaoAsync(uLoc);
 
                     await Application.Current.MainPage
                         .DisplayAlert("Informação", mensagem, "Ok");

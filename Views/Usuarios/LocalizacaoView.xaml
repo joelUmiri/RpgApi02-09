@@ -5,7 +5,20 @@
              x:Class="AppRpgEtec.Views.Usuarios.LocalizacaoView"
              Title="LocalizacaoView">
 
-    <maps:Map x:Name="mapa" ItemsSource="{Binding MeuMapa}">
+    <maps:Map x:Name="mapa" ItemsSource="{Binding MeuMapa}"
+              MapType="Hybrid" IsShowingUser="true"
+              IsZoomEnabled="True" IsTrafficEnabled="True">
+        
+        <maps:Map.ItemTemplate>
+            <DataTemplate>
+                <maps:Pin Location="{Binding Location}"
+                          Address="{Binding Address}"
+                          Label="{Binding Label}" />
+                
+            </DataTemplate>
+        </maps:Map.ItemTemplate>
     </maps:Map>
+    
+    
 
 </ContentPage>
