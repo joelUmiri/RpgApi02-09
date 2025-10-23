@@ -1,65 +1,110 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AppRpgEtec.Models;
+using AppRpgEtec.Services.Usuarios;
 using Microsoft.Maui.Controls.Maps;
 using Microsoft.Maui.Maps;
 using Map = Microsoft.Maui.Controls.Maps.Map;
-     
+
 
 namespace AppRpgEtec.ViewModels.Usuarios
 {
-    private Map meuMapa;
-
-    public Map MeuMapa
+    public class LocalizacaoViewModel : BaseViewModel
     {
-        get => meuMapa;
-        set
+        private UsuarioService uService;
+        public LocalizacaoViewModel()
         {
-            if (value != null)
+            string token = Preferences.Get("UsuarioToken", string.Empty);
+            uService = new UsuarioService(token);
+        }
+
+        private Map meuMapa;
+
+        public Map MeuMapa
+        {
+            get => meuMapa;
+            set
             {
-                meuMapa = value
-                OnPropertyChanged();
+                if (value != null)
+                {
+                    meuMapa = value;
+                    OnPropertyChanged();
+                }
             }
         }
-    }
 
-    public async void InicializarMapa()
-    {
-        try
+        public async void InicializarMapa()
         {
-            Location location = new Location(-23.5200241d, -46.596498d);
-            Pin pinEtec = new Pin()
+            try
             {
-                Type = PinType.Place,
-                Label = "Etec Horácio",
-                Address = "Rua Alcântara, 113, Vila Guilherme",
-                Location = location
-            };
+                Location location = new Location(-23.5200241d, -46.596498d);
+                Pin pinEtec = new Pin()
+                {
+                    Type = PinType.Place,
+                    Label = "Etec Horácio",
+                    Address = "Rua Alcântara, 113, Vila Guilherme",
+                    Location = location
+                };
 
-            Map map = new Map();
-            MapSpan mapSpan = MapSpan
-                .FromCenterAndRadius(location, Distance.FromKilometers(5));
-            map.Pins.Add(pinEtec);
-            map.MoveToRegion(mapSpan);
+                Map map = new Map();
+                MapSpan mapSpan = MapSpan
+                    .FromCenterAndRadius(location, Distance.FromKilometers(5));
+                map.Pins.Add(pinEtec);
+                map.MoveToRegion(mapSpan);
 
-            MeuMapa = map;
+                MeuMapa = map;
+            }
+            catch (Exception ex)
+            {
+                await Application.Current.MainPage
+                        .DisplayAlert("Erro", ex.Message, "OK");
+            }
         }
-        catch (Exception ex)
+
+        public async void ExibirUsuariosNoMapa()
         {
-            await Application.Current.MainPage
-                    .DisplayAlert("Erro", ex.Message, "OK");
+            try
+            {
+                ObservableCollection<Usuario> ocUsuarios = await uService.GetUsuarioAsync();
+                List<Usuario> listaUsuarios = new List<Usuario>(ocUsuarios);
+                Map map = new Map();
+
+                foreach (Usuario u in listaUsuarios)
+                {
+                    if (u.Latitude != null && u.Longitude != null)
+                    {
+                        double latitude = (double)u.Latitude;
+                        double longitude = (double)u.Longitude;
+                        Location location = new Location(latitude, longitude);
+
+                        Pin pintAtual = new Pin()
+                        {
+                            Type = PinType.Place,
+                            Label = u.Username,
+                            Address = $"E-mail: {u.Email}",
+                            Location = location
+                        };
+                        map.Pins.Add(pintAtual);
+                    }
+                }
+                MeuMapa = map;
+            }
+            catch (Exception ex)
+            {
+                await Application.Current.MainPage.DisplayAlert("Erro", ex.Message, "OK");
+            }
         }
+
+
+
+
+
+
     }
-
-    internal class LocalizacaoViewModel
-    {
-        internal void InicializarMapa()
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-
 }
+
+
