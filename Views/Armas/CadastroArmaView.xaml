@@ -4,9 +4,26 @@
              x:Class="AppRpgEtec.Views.Armas.CadastroArmaView"
              Title="CadastroArmaView">
     <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
+        <VerticalStackLayout Spacing="3" Padding="15">
+            <Label Text="Id" FontSize="Medium"/>
+            <Entry Text="{Binding Id}" IsEnabled="False" FontSize="Medium"/>
+            <Label Text="Nome" FontSize="Medium" />
+            <Entry Text="{Binding Nome}" FontSize="Medium" />
+
+            <Label Text="Dano" FontSize="Medium" />
+            <Entry Text="{Binding Dano}" FontSize="Medium" Keyboard="Numeric" />
+            
+            <Label Text="Personagem" FontSize="Medium" />
+
+            <Picker Title="---Selecione o personagem---"  
+                 ItemsSource="{Binding Personagens}" 
+                 ItemDisplayBinding="{Binding Nome}" 
+                 SelectedItem="{Binding PersonagemSelecionado}" />
+            
+            <HorizontalStackLayout Spacing="20">
+                <Button Text="Salvar" Command="{Binding SalvarCommand}"></Button>
+                <Button Text="Cancel" Command="{Binding CancelarCommand}"></Button>
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
     </VerticalStackLayout>
 </ContentPage>

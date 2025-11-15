@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:maps="clr-namespace:Microsoft.Maui.Controls.Maps;assembly=Microsoft.Maui.controls.Maps"
              x:Class="AppRpgEtec.Views.Usuarios.LocalizacaoView"
+             xmlns:maps="clr-namespace:Microsoft.Maui.Controls.Maps;assembly=Microsoft.Maui.Controls.Maps"
              Title="LocalizacaoView">
 
     <maps:Map x:Name="mapa" ItemsSource="{Binding MeuMapa}"
@@ -12,13 +12,9 @@
         <maps:Map.ItemTemplate>
             <DataTemplate>
                 <maps:Pin Location="{Binding Location}"
-                          Address="{Binding Address}"
-                          Label="{Binding Label}" />
-                
+                      Address="{Binding Address}"
+                      Label="{Binding Label}" />
             </DataTemplate>
         </maps:Map.ItemTemplate>
     </maps:Map>
-    
-    
-
 </ContentPage>

@@ -11,5 +11,6 @@ public partial class CadastroArmaView : ContentPage
 
 		cadViewModel = new CadastroArmaViewModel();
 		BindingContext = cadViewModel;
+		Title = "Nova Arma";
 	}
 }

@@ -14,6 +14,11 @@ namespace AppRpgEtec.ViewModels.Personagens
     {
         private PersonagemService pService;
         public ObservableCollection<Personagem> Personagens { get; set; }
+        public ICommand NovoPersonagemCommand { get; }
+        public ICommand RemoverPersonagemCommand { get; set; }
+        //public Personagem Personagem { get => personagem; set => personagem = value; }
+
+        // construtor 
         public ListagemPersonagemViewModel()
         {
             string token = Preferences.Get("UsuarioToken", string.Empty);
@@ -23,24 +28,25 @@ namespace AppRpgEtec.ViewModels.Personagens
             _ = ObterPersonagens();
 
             NovoPersonagemCommand = new Command(async () => { await ExibirCadastroPersonagem(); });
-            RemoverPersonagemCommand =
-                new Command<Personagem>(async (Personagem p) => { await RemoverPersonagem(p); });
+            RemoverPersonagemCommand = new Command<Personagem>(async (Personagem p) => { await RemoverPersonagem(p); });
         }
-        public ICommand NovoPersonagemCommand { get; }
-        public ICommand RemoverPersonagemCommand { get; set; }
+
       
+
+        // Proximos elementos da classe aqui
 
         public async Task ObterPersonagens()
         {
-            try
+            try // Junto com o Cacth evitará que erros fechem o aplicativo
             {
                 Personagens = await pService.GetPersonagensAsync();
-                OnPropertyChanged(nameof(Personagens));
+                OnPropertyChanged(nameof(Personagens));  // Informara a view que houve carregamento
             }
-            catch (Exception ex)
+            catch (Exception ex) 
             {
+                // Captara o erro para exibir em tela 
                 await Application.Current.MainPage
-                    .DisplayAlert("Ops", ex.Message + " Detalhes " + ex.InnerException, "Ok");
+                    .DisplayAlert("Ops", ex.Message, "Detalhes" + ex.InnerException, "Ok");
             }
         }
 
@@ -53,48 +59,46 @@ namespace AppRpgEtec.ViewModels.Personagens
             catch (Exception ex)
             {
                 await Application.Current.MainPage
-                    .DisplayAlert("ops", ex.Message + " Detalhes: " + ex.InnerException, "Ok");
+                    .DisplayAlert("Ops", ex.Message, "Detalhes:" + ex.InnerException, "Ok");
+
             }
         }
 
         private Personagem personagemSelecionado;
-
         public Personagem PersonagemSelecionado
         {
-            get { return personagemSelecionado; }
-            set
+            get { return PersonagemSelecionado1; }
+            set 
             {
-                if (value != null)
+                if(value != null)
                 {
-                    personagemSelecionado = value;
-
-                    Shell.Current
-                        .GoToAsync($"cadPersonagemView?pId={personagemSelecionado.Id}");
+                    PersonagemSelecionado1 = value;
+                    Shell.Current.GoToAsync($"cadPersonagemView?pId={PersonagemSelecionado1.Id}");
                 }
             }
         }
+
+        public Personagem PersonagemSelecionado1 { get => personagemSelecionado; set => personagemSelecionado = value; }
 
         public async Task RemoverPersonagem(Personagem p)
         {
             try
             {
-                if (await Application.Current.MainPage
-                    .DisplayAlert("Confirmação", $"Confirma a remoção de {p.Nome}?", "Sim", "Não"))
+                if(await Application.Current.MainPage.DisplayAlert("Confirmação", $"Confirmação a remoção de {p.Nome}?","Sim", "Não"))
                 {
-                    await pService.DeletarPersonagemAsync(p.Id);
+                    await pService.DeletePersonagemAsync(p.Id);
 
-                    await Application.Current.MainPage.DisplayAlert("Mensagem",
-                        "Personagem removido com sucesso!", "Ok");
+                    await Application.Current.MainPage.DisplayAlert("Mensagem", "Personagem removido com sucesso!", "Ok");
 
                     _ = ObterPersonagens();
                 }
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
-                await Application.Current.MainPage
-                    .DisplayAlert("Ops", ex.Message + " Detalhes: " + ex.InnerException, "Ok");
+                await Application.Current.MainPage.DisplayAlert("Ops", ex.Message + " Detalhes: " + ex.InnerException, "Ok");
             }
         }
-
+       
+   
     }
 }
