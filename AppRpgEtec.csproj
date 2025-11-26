@@ -60,22 +60,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Remove="ViewModels\Armas\IObservableCollection.cs" />
-	  <Compile Remove="ViewModels\Armas\ListagemArma.cs" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<PackageReference Include="Azure.Storage.Blobs" Version="12.26.0" />
+		<PackageReference Include="Azure.Storage.Blobs" Version="12.19.1" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
-		<PackageReference Include="Microsoft.Maui.Controls.Maps" Version="9.0.110" />
+		<PackageReference Include="Microsoft.Maui.Controls.Maps" Version="8.0.21" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Compile Update="Views\Armas\ListagemView.xaml.cs">
-	    <DependentUpon>ListagemView.xaml</DependentUpon>
-	  </Compile>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -92,6 +81,9 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\Disputas\ListagemView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Disputas\ListagemView2.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\Personagens\CadastroPersonagemView.xaml">
@@ -112,10 +104,6 @@
 	  <MauiXaml Update="Views\Usuarios\LoginView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="ExercicioAula14\" />
 	</ItemGroup>
 
 </Project>

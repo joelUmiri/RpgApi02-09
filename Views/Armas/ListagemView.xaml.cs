@@ -1,7 +1,6 @@
-using AppRpgEtec.ViewModels;
 using AppRpgEtec.ViewModels.Armas;
-namespace AppRpgEtec.Views.Armas;
 
+namespace AppRpgEtec.Views.Armas;
 
 public partial class ListagemView : ContentPage
 {
@@ -12,7 +11,7 @@ public partial class ListagemView : ContentPage
 
 		viewModel = new ListagemArmaViewModel();
 		BindingContext = viewModel;
-		Title = "Armas - App Rpg Etec";
+		Title = "Armas - APP RPG ETEC";
 	}
 
     protected override void OnAppearing()

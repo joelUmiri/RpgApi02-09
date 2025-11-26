@@ -1,4 +1,3 @@
-using AppRpgEtec.Models;
 using AppRpgEtec.ViewModels.Usuarios;
 
 namespace AppRpgEtec.Views.Usuarios;
@@ -9,7 +8,6 @@ public partial class LoginView : ContentPage
 	public LoginView()
 	{
 		InitializeComponent();
-
 		usuarioViewModel = new UsuarioViewModel();
 		BindingContext = usuarioViewModel;
 	}

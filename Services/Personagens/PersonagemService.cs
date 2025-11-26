@@ -15,18 +15,16 @@ namespace AppRpgEtec.Services.Personagens
 
         private string _token;
 
-        public PersonagemService(string token)
+        public PersonagemService (string token)
         {
-            _request = new Request();
+            _request = new Request ();
             _token = token;
         }
 
-        // Proximos metodos aqui
         public async Task<int> PostPersonagemAsync(Personagem p)
         {
             return await _request.PostReturnIntAsync(apiUrlBase, p, _token);
         }
-
         public async Task<ObservableCollection<Personagem>> GetPersonagensAsync()
         {
             string urlComplementar = string.Format("{0}", "/GetAll");
@@ -35,7 +33,6 @@ namespace AppRpgEtec.Services.Personagens
             _token);
             return listaPersonagens;
         }
-
         public async Task<Personagem> GetPersonagemAsync(int personagemId)
         {
             string urlComplementar = string.Format("/{0}", personagemId);
@@ -49,14 +46,42 @@ namespace AppRpgEtec.Services.Personagens
             var result = await _request.PutAsync(apiUrlBase, p, _token);
             return result;
         }
-
         public async Task<int> DeletePersonagemAsync(int personagemId)
         {
             string urlComplementar = string.Format("/{0}", personagemId);
             var result = await _request.DeleteAsync(apiUrlBase + urlComplementar, _token);
             return result;
         }
+        public async Task<ObservableCollection<Personagem>> GetByNomeAproximadoAsync(string busca)
+        {
+            string urlComplementar = $"/GetByNomeAproximado/{busca}";
+            ObservableCollection<Models.Personagem> listaPersonagens = await
+                _request.GetAsync<ObservableCollection<Models.Personagem>>(apiUrlBase + urlComplementar, _token);
+            return listaPersonagens;
+        }
 
+        public async Task<int> PutRestaurarPontosAsync(Personagem p)
+        {
+            string urlComplementar = "/RestaurarPontosVida";
+            var result = await _request.PutAsync(apiUrlBase + urlComplementar, p, _token);
+            return result;
+        }
+
+        public async Task<int> PutZerarRankingAsync(Personagem p)
+        {
+            string urlComplementar = "/ZerarRanking";
+            var result = await _request.PutAsync(apiUrlBase + urlComplementar, p, _token);
+            return result;
+        }
+
+        public async Task<int> PutZerarRankingRestaurarVidasGeralAsync()
+        {
+            string urlComplementar = "/ZerarRankingRestaurarVidas";
+            var resul = await _request.PutAsync(apiUrlBase + urlComplementar, new Personagem(), _token);
+            return resul;
+        }
 
     }
+
+
 }

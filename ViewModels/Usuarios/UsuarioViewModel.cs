@@ -6,63 +6,60 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using AppRpgEtec.Models;
 using AppRpgEtec.Services.Usuarios;
-using AppRpgEtec.Views.Personagens;
 using AppRpgEtec.Views.Usuarios;
+using AppRpgEtec.Views.Personagens;
 
 namespace AppRpgEtec.ViewModels.Usuarios
 {
     public class UsuarioViewModel : BaseViewModel
     {
+
         public UsuarioViewModel()
         {
-            //
-            uServices = new UsuarioService();
-            //chama os metodo de baixo(Horganização).
-            InicializarCommands();
+            uService = new UsuarioService();
+            InicializarCommand();
         }
-        public void InicializarCommands()
+
+        public void InicializarCommand()
         {
-            AutenticarCommand = new Command(async () => await AutenticarUsuario());
+            AutenticarCommand = new Command(async() => await AutenticarUsuario());
             RegistrarCommand = new Command(async () => await RegistrarUsuario());
-            DirecionarCadastroCommand = new Command(async () => await DirecionarParaCadastro());
+            DirecionarCadastroCommand = new Command(async() => await DirecionarParaCadastro());
         }
-        private UsuarioService uServices;
+
+        private UsuarioService uService;
+
         public ICommand AutenticarCommand { get; set; }
+
         public ICommand RegistrarCommand { get; set; }
         public ICommand DirecionarCadastroCommand { get; set; }
-       
+        
 
-        //region compacta o codigo visualmente.
         #region AtributosPropriedades
         private string login = string.Empty;
         private string senha = string.Empty;
 
-        //gerar GET/SET Ctrl + r + e
-        public string Login 
+        public string Login
         {
-            get {return  login; }
-            set 
-            { 
+            get => login;
+            set
+            {
                 login = value;
                 OnPropertyChanged();
             }
         }
         public string Senha 
-        {
-            get { return senha; }
+        {   get => senha;
             set
-            { 
-                senha = value; 
+            {
+                senha = value;
                 OnPropertyChanged();
             }
         }
-
-
         #endregion
 
         #region Metodos
 
-        // atributos para controlar a operação de coleta de geolocalização
         private CancellationTokenSource _cancelTokenSource;
         private bool _isCheckingLocation;
 
@@ -70,26 +67,23 @@ namespace AppRpgEtec.ViewModels.Usuarios
         {
             try
             {
-                // metodo de chamada para API
                 Usuario u = new Usuario();
-                u.Username = login;
-                u.PasswordString = senha;
+                u.Username = Login;
+                u.PasswordString = Senha;
 
-                //Chamada a API
-                Usuario uAutenticado = await uServices.PostAutenticarUsuarioAsync(u);
+                Usuario uAutenticado = await uService.PostAutenticarUsuarioAsync(u);
 
-                //Se for diferente de vazio, Se não...
-                if (!string.IsNullOrEmpty(uAutenticado.Token))
+                if(!string.IsNullOrEmpty(uAutenticado.Token))
                 {
-                    string mensagem = $"Bem-vindo(a) {uAutenticado.Username}";
+                    string mensagem = $"Bem Vindo(a) 👀🎉 {uAutenticado.Username}";
 
-                    //Guarda dados para uso futuro
+                    //Guardando dados para o futuro
                     Preferences.Set("UsuarioId", uAutenticado.Id);
                     Preferences.Set("UsuarioUsername", uAutenticado.Username);
                     Preferences.Set("UsuarioPerfil", uAutenticado.Perfil);
                     Preferences.Set("UsuarioToken", uAutenticado.Token);
 
-                    // Início da coleta de Geolocalização atual para Atualizar na API
+                    //Inicio da coleta de Geolocalizacao atual para Atualizacao na API
                     _isCheckingLocation = true;
                     _cancelTokenSource = new CancellationTokenSource();
                     GeolocationRequest request = new GeolocationRequest(GeolocationAccuracy.Medium, TimeSpan.FromSeconds(10));
@@ -103,66 +97,63 @@ namespace AppRpgEtec.ViewModels.Usuarios
 
                     UsuarioService uServiceLoc = new UsuarioService(uAutenticado.Token);
                     await uServiceLoc.PutAtualizarLocalizacaoAsync(uLoc);
-                    // Fim da coleta de Geolocalização atual para Atualização na API
+                    //Fim da coleta de Geolocalização atual para atualizacao da API
 
-                    await Application.Current.MainPage.DisplayAlert("Informação", mensagem, "Ok");
+                    await Application.Current.MainPage.DisplayAlert("Informação", mensagem, "OK");
 
                     Application.Current.MainPage = new AppShell();
-                    // Alteração para que view inicial possa ser a de listagem.
                 }
                 else
                 {
-                    await Application.Current.MainPage
-                        .DisplayAlert("Informação", "Dados incorretos! 🤨 ", "Ok");
+                    await Application.Current.MainPage.DisplayAlert("Informação", "Dados INCORRETOS 😎🤦‍", "OK");
                 }
             }
             catch (Exception ex)
             {
-                await Application.Current.MainPage
-                    .DisplayAlert("Informações", ex.Message + ex.InnerException, "Ok");
+
+                await Application.Current.MainPage.DisplayAlert("Informação", ex.Message + ex.InnerException, "OK");
             }
         }
 
-        public async Task RegistrarUsuario() //Metodo para registrar um usuario
+        public async Task RegistrarUsuario()
         {
             try
             {
-                //Proxima codificacao
                 Usuario u = new Usuario();
                 u.Username = Login;
-                u.PasswordString = senha;
+                u.PasswordString = Senha;
 
-                Usuario uRegistrado = await uServices.PostRegistrarUsuarioAsync(u);
+                Usuario uRegistrado = await uService.PostRegistrarUsuarioAsync(u);
 
                 if (uRegistrado.Id != 0)
                 {
-                    string mensagem = $"Usuário Id {uRegistrado.Id} registrado com sucesso.";
-                    await Application.Current.MainPage.DisplayAlert("Informação", mensagem, "Ok");
+                    string mensagem = $"Usuário Id {uRegistrado.Id} registrado com sucesso";
+                    await Application.Current.MainPage.DisplayAlert("Informção", mensagem, "OK");
 
-                    await Application.Current.MainPage.Navigation.PopAsync(); // Remove  a pagina da pilha de visualização.
+                    await Application.Current.MainPage.Navigation.PopAsync(); //REMOVE A PAGINA DA PILHA DE VISUALIZAÇÃO
                 }
             }
             catch (Exception ex)
             {
-                await Application.Current.MainPage
-                    .DisplayAlert("Informação", ex.Message + "Detalhes:" + ex.InnerException, "Ok");
+                await Application.Current.MainPage.DisplayAlert("Informação", ex.Message + "Detalhes: " + ex.InnerException, "OK");
             }
+
         }
 
-        public async Task DirecionarParaCadastro() //Método para exibição da view de Cadastro
+        public async Task DirecionarParaCadastro() //METODO PARA EXIBIÇÃO DA VIEW DE CADASTRO
         {
             try
             {
-                await Application.Current.MainPage
-                    .Navigation.PushAsync(new CadastroView());
+                await Application.Current.MainPage.Navigation.PushAsync(new CadastroView());
             }
             catch (Exception ex)
             {
-                await Application.Current.MainPage
-                    .DisplayAlert("Informação", ex.Message, "Detalhes" + ex.InnerException, "Ok");
+                await Application.Current.MainPage.DisplayAlert("Informação", ex.Message + "Detalhes" + ex.InnerException, "OK");
             }
         }
 
         #endregion
+
+        
     }
 }

@@ -1,18 +1,19 @@
-﻿using AppRpgEtec.Models;
-using AppRpgEtec.Services.Usuarios;
-using Microsoft.Maui.Controls.Maps;
-using Microsoft.Maui.Maps;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AppRpgEtec.Services.Usuarios;
+using Microsoft.Maui.Controls.Maps;
+using Microsoft.Maui.Maps;
 using Map = Microsoft.Maui.Controls.Maps.Map;
+using AppRpgEtec.Models;
+using System.Collections.ObjectModel;
+
 
 namespace AppRpgEtec.ViewModels.Usuarios
 {
-    public class LocalizacaoViewModel:BaseViewModel
+    public class LocalizacaoViewModel : BaseViewModel
     {
         private UsuarioService uService;
         public LocalizacaoViewModel()
@@ -20,72 +21,72 @@ namespace AppRpgEtec.ViewModels.Usuarios
             string token = Preferences.Get("UsuarioToken", string.Empty);
             uService = new UsuarioService(token);
         }
-
         private Map meuMapa;
+
         public Map MeuMapa
         {
             get => meuMapa;
             set
             {
-                if (value != null)
+                if (value != meuMapa)
                 {
                     meuMapa = value;
-                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(MeuMapa));
                 }
             }
         }
 
-        #region Metodos
         public async void InicializarMapa()
         {
             try
             {
-                Location location = new Location(-23.5200214d, -46.596498d);
+                Location location = new Location(-23.5200241d, -46.596498d);
+
                 Pin pinEtec = new Pin()
                 {
                     Type = PinType.Place,
-                    Label = "Etec Horácio",
-                    Address = "Rua Alcântara, 113, Vila Guilherme",
-                    Location = location
+                    Label = "Etec Horacio",
+                    Address = "Rua alcantara, 113, Vila Guilherme",
+                    Location = location,
                 };
 
                 Map map = new Map();
-                MapSpan mapSpan = MapSpan
-                    .FromCenterAndRadius(location, Distance.FromKilometers(5));
+
+                MapSpan mapSpan = MapSpan.FromCenterAndRadius(location, Distance.FromKilometers(5));
+
                 map.Pins.Add(pinEtec);
+
                 map.MoveToRegion(mapSpan);
 
                 MeuMapa = map;
             }
             catch (Exception ex)
             {
-                await Application.Current.MainPage
-                    .DisplayAlert("Erro", ex.Message, "OK");
+                await Application.Current.MainPage.DisplayAlert("Erro", ex.Message, "OK");
             }
         }
 
-        public async void ExibirUsuriosNoMapa()
+        public async void ExibirUsuariosNoMapa()
         {
             try
             {
-                //Using AppRpgEtec.Models
                 ObservableCollection<Usuario> ocUsuarios = await uService.GetUsuariosAsync();
-                List<Usuario> listaUsarios = new List<Usuario>(ocUsuarios);
+                List<Usuario> listaUsuarios = new List<Usuario>(ocUsuarios);
                 Map map = new Map();
 
-                foreach (Usuario u in listaUsarios)
+                foreach (Usuario u in listaUsuarios)
                 {
                     if (u.Latitude != null && u.Longitude != null)
                     {
                         double latitude = (double)u.Latitude;
-                        double longitude = (double)u.Longitude; 
+                        double longitude = (double)u.Longitude;
                         Location location = new Location(latitude, longitude);
 
                         Pin pinAtual = new Pin()
                         {
                             Type = PinType.Place,
                             Label = u.Username,
-                            Address = $"E-mail: { u.Email }",
+                            Address = $"E-mail: {u.Email}",
                             Location = location
                         };
                         map.Pins.Add(pinAtual);
@@ -95,10 +96,8 @@ namespace AppRpgEtec.ViewModels.Usuarios
             }
             catch (Exception ex)
             {
-                await Application.Current.MainPage
-                    .DisplayAlert("Error", ex.Message, "OK");
+                await Application.Current.MainPage.DisplayAlert("Erro", ex.Message, "OK");
             }
         }
-        #endregion
     }
 }

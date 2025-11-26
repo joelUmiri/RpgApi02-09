@@ -5,8 +5,7 @@ using System.Collections.ObjectModel;
 using System.Windows.Input;
 
 namespace AppRpgEtec.ViewModels.Armas
-{
-    [QueryProperty("ArmaSelecionadaId", "aId")]
+{    
     public class CadastroArmaViewModel : BaseViewModel
     {
         private ArmaService aService;
@@ -86,20 +85,7 @@ namespace AppRpgEtec.ViewModels.Armas
                     OnPropertyChanged(nameof(PersonagemSelecionado));
                 }
             }
-        }
-
-        private string armaSelecionadaId;//CTRL + R,E
-        public string ArmaSelecionadaId
-        {
-            set
-            {
-                if (value != null)
-                {
-                    armaSelecionadaId = Uri.UnescapeDataString(value);
-                    CarregarArma();
-                }
-            }
-        }
+        }       
 
         public ObservableCollection<Personagem> Personagens { get; set; }
 
@@ -149,27 +135,7 @@ namespace AppRpgEtec.ViewModels.Armas
             }
         }
 
-        public async void CarregarArma()
-        {
-            try
-            {
-                Arma model = await
-                    aService.GetArmaAsync(int.Parse(armaSelecionadaId));
-
-                this.Nome = model.Nome;
-                this.Dano = model.Dano;
-                this.Id = model.Id;
-                this.PersonagemId = model.PersonagemId;
-
-                this.PersonagemSelecionado =
-                    Personagens.FirstOrDefault(x => x.Id == model.PersonagemId);
-            }
-            catch (Exception ex)
-            {
-                await Application.Current.MainPage.DisplayAlert("ops", ex.Message, "Ok");
-            }
-        }
-
+        
         #endregion
 
 

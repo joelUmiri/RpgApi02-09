@@ -7,26 +7,44 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using AppRpgEtec.Models;
 using AppRpgEtec.Services.Armas;
-using AppRpgEtec.ViewModels;
 
 namespace AppRpgEtec.ViewModels.Armas
 {
-    internal class ListagemArmaViewModel : BaseViewModel
+    public class ListagemArmaViewModel : BaseViewModel
     {
-       
-         private ArmaService aService;
-         public ObservableCollection<Arma> Armas { get; set; }
-         public ListagemArmaViewModel()
-         {
+        private ArmaService aService;
+        public ObservableCollection<Arma> Armas { get; set; }
+        public ListagemArmaViewModel()
+        {
             string token = Preferences.Get("UsuarioToken", string.Empty);
             aService = new ArmaService(token);
             Armas = new ObservableCollection<Arma>();
 
             _ = ObterArmas();
+
             NovaArmaCommand = new Command(async () => { await ExibirCadastroArma(); });
-         }
-        // Proximos elementos da classe aqui.  PDF 5 - CONTINUAR .....
-        public ICommand NovaArmaCommand { get; set; }
+            RemoverArmaCommand = new Command<Arma>(async (Arma a) => { await RemoverArma(a); });
+        }
+
+        public ICommand NovaArmaCommand { get; }
+        public ICommand RemoverArmaCommand { get; set; }
+        private Arma armaSelecionada;
+        public Arma ArmaSelecionada
+        {
+            get
+            {
+                return armaSelecionada;
+            }
+            set
+            {
+                if (value != null)
+                {
+                    armaSelecionada = value;
+
+                    Shell.Current.GoToAsync($"CadArmaView?pId={armaSelecionada.Id}");
+                }
+            }
+        }
 
         public async Task ObterArmas()
         {
@@ -37,8 +55,7 @@ namespace AppRpgEtec.ViewModels.Armas
             }
             catch (Exception ex)
             {
-                await Application.Current.MainPage
-                    .DisplayAlert("Ops", ex.Message + " Detalhes" + ex.InnerException, "Ok");
+                await Application.Current.MainPage.DisplayAlert("Ops", ex.Message + "Detalhes: " + ex.InnerException, "OK");
             }
         }
 
@@ -46,18 +63,32 @@ namespace AppRpgEtec.ViewModels.Armas
         {
             try
             {
-                await Shell.Current.GoToAsync("cadArmasView");
+                await Shell.Current.GoToAsync("cadArmaView");
             }
             catch (Exception ex)
             {
-                await Application.Current.MainPage
-                    .DisplayAlert("Ops", ex.Message + "Detalhes: " + ex.InnerException, "Ok");
+                await Application.Current.MainPage.DisplayAlert("Ops", ex.Message + "Detalhes" + ex.InnerException, "OK");
             }
         }
 
+        public async Task RemoverArma(Arma a)
+        {
+            try
+            {
+                if (await Application.Current.MainPage
+                    .DisplayAlert("Confirmação", $"Confirma a remoção de {a.Nome}?", "Sim", "Não")) ;
+                {
+                    await aService.DeleteArmaAsync(a.Id);
 
+                    await Application.Current.MainPage.DisplayAlert("Mensagem", "Arma removido com sucesso!", "OK");
 
-       
-
-    } // Fim da classe
+                    await ObterArmas();
+                }
+            }
+            catch (Exception ex)
+            {
+                await Application.Current.MainPage.DisplayAlert("Ops", ex.Message + "Detalhes: " + ex.InnerException, "OK");
+            }
+        }
+    }
 }
